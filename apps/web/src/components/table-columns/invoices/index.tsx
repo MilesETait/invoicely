@@ -51,6 +51,15 @@ export const columns = [
     enableSorting: false,
   }),
 
+  columnHelper.accessor((row) => row.invoiceFields.clientDetails.name, {
+    id: "clientName",
+    header: ({ column }) => <HeaderColumnButton column={column}>Client</HeaderColumnButton>,
+    cell: ({ row }) => (
+      <div className="text-xs font-medium">{row.original.invoiceFields.clientDetails.name}</div>
+    ),
+    enableSorting: false,
+  }),
+
   columnHelper.accessor((row) => row.id, {
     id: "id",
     header: ({ column }) => <HeaderColumnButton column={column}>ID</HeaderColumnButton>,
@@ -226,6 +235,14 @@ export const columnConfig = [
       { label: "", value: "local", icon: <Badge variant="default">Local</Badge> },
       { label: "", value: "server", icon: <Badge variant="rose">Server</Badge> },
     ])
+    .build(),
+  // Client
+  columnConfigHelper
+    .text()
+    .id("clientName")
+    .displayName("Client")
+    .accessor((row) => row.invoiceFields.clientDetails.name)
+    .icon(IdBadgeIcon)
     .build(),
   // Id
   columnConfigHelper

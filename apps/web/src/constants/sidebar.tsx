@@ -1,8 +1,16 @@
-import { FolderFeatherIcon, ReceiptIcon, VersionsIcon } from "@/assets/icons";
+import { FolderFeatherIcon, GearIcon, ReceiptIcon, VersionsIcon } from "@/assets/icons";
 import type { ISidebar } from "@/types";
 import { LINKS } from "./links";
 
 export const SIDEBAR_ITEMS: ISidebar = {
+  Create: [
+    {
+      name: "Create Invoice",
+      url: LINKS.CREATE.INVOICE,
+      icon: <ReceiptIcon />,
+      emphasis: true,
+    },
+  ],
   Navigation: [
     {
       name: "Invoices",
@@ -14,12 +22,10 @@ export const SIDEBAR_ITEMS: ISidebar = {
       url: LINKS.ASSETS,
       icon: <FolderFeatherIcon />,
     },
-  ],
-  Create: [
     {
-      name: "Create Invoice",
-      url: LINKS.CREATE.INVOICE,
-      icon: <ReceiptIcon />,
+      name: "Settings",
+      url: LINKS.SETTINGS,
+      icon: <GearIcon />,
     },
   ],
 };

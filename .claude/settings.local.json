@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc:*)",
+      "Bash(yarn workspace:*)",
+      "Bash(corepack yarn:*)",
+      "Bash(node_modules/.bin/tsc --noEmit --pretty)",
+      "Bash(ls \"C:\\\\Users\\\\miles\\\\Documents\\\\GitHub\\\\invoicely\\\\node_modules\\\\.bin\\\\tsc\"*)",
+      "Bash(node ../../node_modules/typescript/bin/tsc --noEmit --pretty)"
+    ]
+  }
+}

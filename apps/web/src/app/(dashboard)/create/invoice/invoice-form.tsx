@@ -7,6 +7,7 @@ import SheetImageSelectorTrigger from "@/components/ui/image/sheet-image-selecto
 import { InvoiceImageSelectorSheet } from "./invoiceHelpers/invoice-image-selector-sheet";
 import { ZodCreateInvoiceSchema } from "@/zod-schemas/invoice/create-invoice";
 import { InvoiceTemplateSelector } from "./invoiceHelpers/invoice-templates";
+import { PresetDropdown } from "@/components/ui/preset-dropdown";
 import { FormColorPicker } from "@/components/ui/form/form-color-picker";
 import InvoiceItemsSection from "./invoiceHelpers/invoice-items-section";
 import { FormDatePicker } from "@/components/ui/form/form-date-picker";
@@ -26,6 +27,8 @@ import { Badge } from "@/components/ui/badge";
 import { useTRPC } from "@/trpc/client";
 import { cn } from "@/lib/utils";
 import React from "react";
+
+import type { CompanyDetailsPresetData, ClientDetailsPresetData, InvoiceDetailsPresetData, AdditionalInfoPresetData, InvoiceItemPresetData } from "@/zod-schemas/preset";
 
 interface InvoiceFormProps {
   form: UseFormReturn<ZodCreateInvoiceSchema>;
@@ -61,7 +64,28 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ form }) => {
           <Accordion type="single" collapsible defaultValue="company-details" className="w-full divide-y border-b">
             {/* Company Details */}
             <AccordionItem value="company-details">
-              <AccordionTrigger>Company Details</AccordionTrigger>
+              <AccordionTrigger>
+                <div className="flex items-center gap-2">
+                  <span>Company Details</span>
+                  <PresetDropdown<CompanyDetailsPresetData>
+                    sectionType="companyDetails"
+                    getCurrentData={() => ({
+                      name: form.getValues("companyDetails.name"),
+                      address: form.getValues("companyDetails.address"),
+                      metadata: form.getValues("companyDetails.metadata"),
+                      logo: form.getValues("companyDetails.logo") ?? null,
+                      signature: form.getValues("companyDetails.signature") ?? null,
+                    })}
+                    onLoadPreset={(data) => {
+                      form.setValue("companyDetails.name", data.name);
+                      form.setValue("companyDetails.address", data.address);
+                      form.setValue("companyDetails.metadata", data.metadata);
+                      if (data.logo) form.setValue("companyDetails.logo", data.logo);
+                      if (data.signature) form.setValue("companyDetails.signature", data.signature);
+                    }}
+                  />
+                </div>
+              </AccordionTrigger>
               <AccordionContent ref={resizeRef} className={cn(container.width > 1200 ? "flex-row gap-4" : "flex-col")}>
                 <div className={cn(container.width > 1200 ? "w-fit" : "w-full [&>*]:w-full", "flex flex-row gap-4")}>
                   <InvoiceImageSelectorSheet
@@ -136,7 +160,24 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ form }) => {
             </AccordionItem>
             {/* Client Details */}
             <AccordionItem value="client-details">
-              <AccordionTrigger>Client Details</AccordionTrigger>
+              <AccordionTrigger>
+                <div className="flex items-center gap-2">
+                  <span>Client Details</span>
+                  <PresetDropdown<ClientDetailsPresetData>
+                    sectionType="clientDetails"
+                    getCurrentData={() => ({
+                      name: form.getValues("clientDetails.name"),
+                      address: form.getValues("clientDetails.address"),
+                      metadata: form.getValues("clientDetails.metadata"),
+                    })}
+                    onLoadPreset={(data) => {
+                      form.setValue("clientDetails.name", data.name);
+                      form.setValue("clientDetails.address", data.address);
+                      form.setValue("clientDetails.metadata", data.metadata);
+                    }}
+                  />
+                </div>
+              </AccordionTrigger>
               <AccordionContent>
                 <FormInput name="clientDetails.name" label="Client Name" reactform={form} placeholder="John Doe" />
                 <FormTextarea
@@ -155,7 +196,28 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ form }) => {
             </AccordionItem>
             {/* Invoice Details */}
             <AccordionItem value="invoice-details">
-              <AccordionTrigger>Invoice Details</AccordionTrigger>
+              <AccordionTrigger>
+                <div className="flex items-center gap-2">
+                  <span>Invoice Details</span>
+                  <PresetDropdown<InvoiceDetailsPresetData>
+                    sectionType="invoiceDetails"
+                    getCurrentData={() => ({
+                      theme: form.getValues("invoiceDetails.theme"),
+                      currency: form.getValues("invoiceDetails.currency"),
+                      prefix: form.getValues("invoiceDetails.prefix"),
+                      paymentTerms: form.getValues("invoiceDetails.paymentTerms"),
+                      billingDetails: form.getValues("invoiceDetails.billingDetails"),
+                    })}
+                    onLoadPreset={(data) => {
+                      form.setValue("invoiceDetails.theme", data.theme);
+                      form.setValue("invoiceDetails.currency", data.currency);
+                      form.setValue("invoiceDetails.prefix", data.prefix);
+                      form.setValue("invoiceDetails.paymentTerms", data.paymentTerms);
+                      form.setValue("invoiceDetails.billingDetails", data.billingDetails);
+                    }}
+                  />
+                </div>
+              </AccordionTrigger>
               <AccordionContent>
                 <FormRow>
                   <FormSelect
@@ -247,14 +309,47 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ form }) => {
             </AccordionItem>
             {/* Invoice Items */}
             <AccordionItem value="invoice-items">
-              <AccordionTrigger>Invoice Items</AccordionTrigger>
+              <AccordionTrigger>
+                <div className="flex items-center gap-2">
+                  <span>Invoice Items</span>
+                  <PresetDropdown<InvoiceItemPresetData>
+                    sectionType="invoiceItem"
+                    getCurrentData={() => {
+                      const items = form.getValues("items");
+                      const lastItem = items[items.length - 1];
+                      return lastItem ?? { name: "", description: "", quantity: 1, unitPrice: 0 };
+                    }}
+                    onLoadPreset={(data) => {
+                      const items = form.getValues("items");
+                      form.setValue("items", [...items, data]);
+                    }}
+                  />
+                </div>
+              </AccordionTrigger>
               <AccordionContent>
                 <InvoiceItemsSection form={form} />
               </AccordionContent>
             </AccordionItem>
             {/* Additional Information */}
             <AccordionItem value="additional-info">
-              <AccordionTrigger>Additional Information</AccordionTrigger>
+              <AccordionTrigger>
+                <div className="flex items-center gap-2">
+                  <span>Additional Information</span>
+                  <PresetDropdown<AdditionalInfoPresetData>
+                    sectionType="additionalInfo"
+                    getCurrentData={() => ({
+                      notes: form.getValues("metadata.notes"),
+                      terms: form.getValues("metadata.terms"),
+                      paymentInformation: form.getValues("metadata.paymentInformation"),
+                    })}
+                    onLoadPreset={(data) => {
+                      form.setValue("metadata.notes", data.notes);
+                      form.setValue("metadata.terms", data.terms);
+                      form.setValue("metadata.paymentInformation", data.paymentInformation);
+                    }}
+                  />
+                </div>
+              </AccordionTrigger>
               <AccordionContent>
                 <FormTextarea
                   name="metadata.notes"

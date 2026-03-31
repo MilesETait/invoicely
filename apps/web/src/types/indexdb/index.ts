@@ -1,4 +1,5 @@
 import { IDBImage, IDBInvoice } from "@/types/indexdb/invoice";
+import { IDBPreset } from "@/types/indexdb/preset";
 import { DBSchema } from "idb";
 export interface IndexedDBSchema extends DBSchema {
   inv_invoices: {
@@ -13,6 +14,14 @@ export interface IndexedDBSchema extends DBSchema {
     value: IDBImage;
     indexes: {
       id: string;
+    };
+  };
+  inv_presets: {
+    key: string;
+    value: IDBPreset;
+    indexes: {
+      id: string;
+      sectionType: string;
     };
   };
 }

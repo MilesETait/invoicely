@@ -6,6 +6,7 @@ export interface ISidebarItem {
   name: string;
   url: string;
   icon: React.ReactNode;
+  emphasis?: boolean;
 }
 
 export interface ISidebarUser {

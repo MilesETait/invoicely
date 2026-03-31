@@ -10,6 +10,7 @@ import {
 import { usePathname } from "next/navigation";
 
 import { type ISidebarItem } from "@/types";
+import { cn } from "@/lib/utils";
 import Link from "next/link";
 
 export function NavigationItem({ title, items }: { title: string; items: ISidebarItem[] }) {
@@ -24,7 +25,15 @@ export function NavigationItem({ title, items }: { title: string; items: ISideba
 
           return (
             <SidebarMenuItem key={item.name}>
-              <SidebarMenuButton asChild variant={isActive ? "active" : "default"}>
+              <SidebarMenuButton
+                asChild
+                variant={isActive ? "active" : "default"}
+                className={cn(
+                  item.emphasis &&
+                    !isActive &&
+                    "bg-primary/10 border border-primary/20 text-primary font-semibold hover:bg-primary/15",
+                )}
+              >
                 <Link href={item.url}>
                   <span className="[&>svg]:size-4">{item.icon}</span>
                   <span className="text-[13px] font-medium tracking-tighter">{item.name}</span>

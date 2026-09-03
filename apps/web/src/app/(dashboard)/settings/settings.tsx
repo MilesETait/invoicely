@@ -17,13 +17,15 @@ export default function Settings() {
                 Server-side
               </Badge>
             </CardTitle>
-            <CardDescription>Connect to your own PostgreSQL database (Supabase, Neon, or any provider).</CardDescription>
+            <CardDescription>
+              Connect to your own PostgreSQL database (Supabase, Neon, or any provider).
+            </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-3 text-sm">
             <p className="text-muted-foreground">
               This app uses Drizzle ORM with PostgreSQL. To connect your own database, set the{" "}
-              <code className="bg-muted rounded px-1.5 py-0.5 text-xs font-mono">DATABASE_URL</code> environment
-              variable in your <code className="bg-muted rounded px-1.5 py-0.5 text-xs font-mono">.env</code> file.
+              <code className="bg-muted rounded px-1.5 py-0.5 font-mono text-xs">DATABASE_URL</code> environment
+              variable in your <code className="bg-muted rounded px-1.5 py-0.5 font-mono text-xs">.env</code> file.
             </p>
             <div className="bg-muted rounded-md p-3 font-mono text-xs">
               <p className="text-muted-foreground"># .env</p>
@@ -34,11 +36,11 @@ export default function Settings() {
               <ol className="text-muted-foreground list-inside list-decimal space-y-1">
                 <li>Go to your Supabase project dashboard</li>
                 <li>
-                  Navigate to <span className="font-medium text-foreground">Project Settings → Database</span>
+                  Navigate to <span className="text-foreground font-medium">Project Settings → Database</span>
                 </li>
                 <li>Copy the &quot;Connection string&quot; (URI format)</li>
                 <li>
-                  Paste it as your <code className="bg-muted rounded px-1 py-0.5 text-xs font-mono">DATABASE_URL</code>
+                  Paste it as your <code className="bg-muted rounded px-1 py-0.5 font-mono text-xs">DATABASE_URL</code>
                 </li>
               </ol>
             </div>
@@ -46,7 +48,7 @@ export default function Settings() {
               <p className="font-medium">After setting the connection string:</p>
               <div className="bg-muted rounded-md p-3 font-mono text-xs">
                 <p className="text-muted-foreground"># Apply the database schema</p>
-                <p>pnpm drizzle-kit push</p>
+                <p>yarn db:migrate</p>
               </div>
               <p className="text-muted-foreground text-xs">
                 The app must be restarted after changing the database connection.
@@ -68,6 +70,11 @@ export default function Settings() {
             <p className="text-muted-foreground">
               When you connect a database and sign in, you can migrate local invoices to the server using the
               &quot;Migrate to DB&quot; action in the invoice list.
+            </p>
+            <p className="text-muted-foreground">
+              Presets behave the same way. Ones you save while signed out stay in IndexedDB on this browser; once you
+              sign in, presets are saved to the server and follow you across devices. The preset dropdown shows both
+              together.
             </p>
           </CardContent>
         </Card>

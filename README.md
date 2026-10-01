@@ -69,8 +69,12 @@ recurring companies, clients, and line items don't have to be retyped.
 
 Presets follow the same dual-storage model as invoices:
 
-- **Signed out** — stored locally in IndexedDB (`inv_presets` object store) and scoped to that browser.
-- **Signed in** — stored in the `presets` table in PostgreSQL via tRPC, so they follow you across devices.
+- **Signed out, or data sync off** — stored locally in IndexedDB (`inv_presets` object store) and scoped to that browser.
+- **Signed in with "Allow data sync" on** — stored in the `presets` table in PostgreSQL via tRPC, so they follow you
+  across devices. This is the same `allowedSavingData` opt-in that invoices and images use, enforced in the dropdown
+  and in the `preset.insert` service.
+
+Each preset lives in exactly one of those places; delete and rename act on wherever it lives.
 
 The dropdown merges both sources, with local presets listed first.
 

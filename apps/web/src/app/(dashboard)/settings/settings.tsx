@@ -79,9 +79,10 @@ export default function Settings() {
               &quot;Migrate to DB&quot; action in the invoice list.
             </p>
             <p className="text-muted-foreground">
-              Presets behave the same way. Ones you save while signed out stay in IndexedDB on this browser; once you
-              sign in, presets are saved to the server and follow you across devices. The preset dropdown shows both
-              together.
+              Presets follow the same rule as invoices. They are saved to the server, and follow you across devices,
+              only when you are signed in and have turned on &quot;Allow data sync&quot; in the user menu. Otherwise
+              they stay in IndexedDB on this browser. The preset dropdown lists both, and presets already on the server
+              stay visible even if you later turn data sync off.
             </p>
           </CardContent>
         </Card>

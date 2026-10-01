@@ -25,8 +25,8 @@
 
 - **IndexedDB** via `idb 8.0.3`
 - Database name: `invoicelygg`
-- Object stores: `inv_invoices`, `inv_images`
-- Used for offline/unauthenticated invoice and asset storage
+- Object stores: `inv_invoices`, `inv_images`, `inv_presets`
+- Used for offline/unauthenticated invoice, asset, and preset storage
 
 ## API Layer
 

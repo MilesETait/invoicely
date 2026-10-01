@@ -22,7 +22,7 @@ Modern, open-source invoice generation platform built with Next.js, tRPC, and Ty
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/legions-developer/invoicely.git
+   git clone https://github.com/MilesETait/invoicely.git
    cd invoicely
    ```
 
@@ -56,6 +56,29 @@ Modern, open-source invoice generation platform built with Next.js, tRPC, and Ty
    ```bash
    yarn dev
    ```
+
+## 🧩 Fork Additions
+
+This fork adds the following on top of upstream `legions-developer/invoicely`:
+
+### Section presets
+
+Each section of the invoice form — company details, client details, invoice details, invoice items,
+and additional information — has a preset dropdown for saving and reloading reusable blocks, so
+recurring companies, clients, and line items don't have to be retyped.
+
+Presets follow the same dual-storage model as invoices:
+
+- **Signed out** — stored locally in IndexedDB (`inv_presets` object store) and scoped to that browser.
+- **Signed in** — stored in the `presets` table in PostgreSQL via tRPC, so they follow you across devices.
+
+The dropdown merges both sources, with local presets listed first.
+
+### Settings page
+
+`/settings` documents how to point the app at your own PostgreSQL instance (Supabase, Neon, or any
+provider) through the `DATABASE_URL` environment variable, and explains how local browser storage
+behaves when no database is connected.
 
 ## 🛠️ Tech Stack
 

@@ -11,6 +11,7 @@ import { PresetDropdown } from "@/components/ui/preset-dropdown";
 import { FormColorPicker } from "@/components/ui/form/form-color-picker";
 import InvoiceItemsSection from "./invoiceHelpers/invoice-items-section";
 import { FormDatePicker } from "@/components/ui/form/form-date-picker";
+import { InvoiceFontSelector } from "./invoiceHelpers/invoice-fonts";
 import { getAllImages } from "@/lib/indexdb-queries/getAllImages";
 import { FormTextarea } from "@/components/ui/form/form-textarea";
 import { FormSelect } from "@/components/ui/form/form-select";
@@ -57,7 +58,8 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ form }) => {
         <form>
           <div className="flex h-14 flex-row items-center justify-between border-b px-4">
             <span className="text-sm font-medium">Invoice Template</span>
-            <div className="">
+            <div className="flex flex-row items-center gap-2">
+              <InvoiceFontSelector form={form} />
               <InvoiceTemplateSelector form={form} />
             </div>
           </div>

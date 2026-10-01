@@ -11,6 +11,7 @@ import {
   HourglassStartIcon,
   IdBadgeIcon,
   PriorityMediumIcon,
+  ReceiptIcon,
   SortNumDescendingIcon,
 } from "@/assets/icons";
 import {
@@ -119,6 +120,12 @@ export const columns = [
     enableSorting: false,
   }),
 
+  columnHelper.accessor((row) => row.invoiceFields.invoiceDetails.date, {
+    id: "invoiceDate",
+    header: ({ column }) => <HeaderColumnButton column={column}>Invoice Date</HeaderColumnButton>,
+    cell: ({ row }) => <FormatTableDateObject date={row.original.invoiceFields.invoiceDetails.date} />,
+  }),
+
   columnHelper.accessor((row) => row.createdAt, {
     id: "createdAt",
     header: ({ column }) => <HeaderColumnButton column={column}>Created At</HeaderColumnButton>,
@@ -216,6 +223,12 @@ export const importInvoiceColumns = [
     ),
   }),
 
+  columnHelper.accessor((row) => row.invoiceFields.invoiceDetails.date, {
+    id: "invoiceDate",
+    header: ({ column }) => <HeaderColumnButton column={column}>Invoice Date</HeaderColumnButton>,
+    cell: ({ row }) => <FormatTableDateObject date={row.original.invoiceFields.invoiceDetails.date} />,
+  }),
+
   columnHelper.accessor((row) => row.createdAt, {
     id: "createdAt",
     header: ({ column }) => <HeaderColumnButton column={column}>Created At</HeaderColumnButton>,
@@ -251,6 +264,14 @@ export const columnConfig = [
     .displayName("ID")
     .accessor((row) => row.id)
     .icon(IdBadgeIcon)
+    .build(),
+  // Invoice Date
+  columnConfigHelper
+    .date()
+    .id("invoiceDate")
+    .displayName("Invoice Date")
+    .accessor((row) => row.invoiceFields.invoiceDetails.date)
+    .icon(ReceiptIcon)
     .build(),
   // Created At
   columnConfigHelper
@@ -313,6 +334,14 @@ export const importInvoiceColumnConfig = [
     .displayName("ID")
     .accessor((row) => row.id)
     .icon(IdBadgeIcon)
+    .build(),
+  // Invoice Date
+  columnConfigHelper
+    .date()
+    .id("invoiceDate")
+    .displayName("Invoice Date")
+    .accessor((row) => row.invoiceFields.invoiceDetails.date)
+    .icon(ReceiptIcon)
     .build(),
   // Created At
   columnConfigHelper

@@ -1,4 +1,4 @@
-import { IDBImage, IDBInvoice } from "@/types/indexdb/invoice";
+import { IDBDefaultDetails, IDBImage, IDBInvoice } from "@/types/indexdb/invoice";
 import { IDBPreset } from "@/types/indexdb/preset";
 import { DBSchema } from "idb";
 export interface IndexedDBSchema extends DBSchema {
@@ -23,5 +23,9 @@ export interface IndexedDBSchema extends DBSchema {
       id: string;
       sectionType: string;
     };
+  };
+  inv_default_details: {
+    key: string;
+    value: IDBDefaultDetails;
   };
 }

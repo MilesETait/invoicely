@@ -1,15 +1,28 @@
 "use client";
 
+import {
+  insertPreset,
+  getPresetsBySection,
+  deletePreset as deletePresetIDB,
+  updatePreset as updatePresetIDB,
+} from "@/lib/indexdb-queries/preset";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+} from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from "@/components/ui/command";
-import { PresetSaveDialog } from "@/components/ui/preset-save-dialog";
-import { BookmarkIcon, PencilIcon, PlusIcon, TrashIcon } from "lucide-react";
-import { insertPreset, getPresetsBySection, deletePreset as deletePresetIDB, updatePreset as updatePresetIDB } from "@/lib/indexdb-queries/preset";
-import type { PresetSectionType } from "@/types/indexdb/preset";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { BookmarkIcon, PencilIcon, PlusIcon, TrashIcon } from "lucide-react";
+import { PresetSaveDialog } from "@/components/ui/preset-save-dialog";
+import type { PresetSectionType } from "@/types/indexdb/preset";
+import { Button } from "@/components/ui/button";
 import { useSession } from "@/lib/client-auth";
 import { useTRPC } from "@/trpc/client";
-import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import * as React from "react";
 
@@ -88,16 +101,28 @@ export function PresetDropdown<T>({ sectionType, onLoadPreset, getCurrentData }:
     onSuccess: () => invalidatePresets(),
   });
 
+  // A preset lives in exactly one place: on the server when the user is signed in and has allowed
+  // data sync (the same opt-in invoices and images use), otherwise in this browser's IndexedDB.
+  // Writing to both would list every preset twice, since the two stores generate different ids.
+  const canSaveToServer = !!session?.user?.allowedSavingData;
+
   const handleSave = async (name: string) => {
     const data = getCurrentData();
-    const id = await insertPreset(sectionType, name, data);
+
+    if (canSaveToServer) {
+      serverInsertMutation.mutate(
+        { sectionType, name, data },
+        {
+          onSuccess: () => toast.success("Preset saved to your account"),
+          onError: (error) => toast.error(error.message),
+        },
+      );
+      return;
+    }
+
+    await insertPreset(sectionType, name, data);
     invalidatePresets();
     toast.success("Preset saved");
-
-    if (session?.user) {
-      serverInsertMutation.mutate({ sectionType, name, data });
-    }
-    return id;
   };
 
   const handleLoad = (preset: PresetEntry) => {
@@ -106,11 +131,11 @@ export function PresetDropdown<T>({ sectionType, onLoadPreset, getCurrentData }:
     toast.success(`Loaded "${preset.name}"`);
   };
 
+  // Delete and rename act on wherever the preset actually lives
   const handleDelete = async (preset: PresetEntry) => {
     if (preset.source === "local") {
       await deletePresetIDB(preset.id);
-    }
-    if (session?.user) {
+    } else {
       serverDeleteMutation.mutate({ id: preset.id });
     }
     invalidatePresets();
@@ -121,8 +146,7 @@ export function PresetDropdown<T>({ sectionType, onLoadPreset, getCurrentData }:
     if (!editingPreset) return;
     if (editingPreset.source === "local") {
       await updatePresetIDB(editingPreset.id, { name });
-    }
-    if (session?.user) {
+    } else {
       serverUpdateMutation.mutate({ id: editingPreset.id, name });
     }
     invalidatePresets();
@@ -214,11 +238,7 @@ export function PresetDropdown<T>({ sectionType, onLoadPreset, getCurrentData }:
         </PopoverContent>
       </Popover>
 
-      <PresetSaveDialog
-        open={saveDialogOpen}
-        onOpenChange={setSaveDialogOpen}
-        onSave={handleSave}
-      />
+      <PresetSaveDialog open={saveDialogOpen} onOpenChange={setSaveDialogOpen} onSave={handleSave} />
 
       <PresetSaveDialog
         open={!!editingPreset}

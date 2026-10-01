@@ -4,6 +4,7 @@
 import { ZodCreateInvoiceSchema } from "@/zod-schemas/invoice/create-invoice";
 import { Document, Page, Text, View, Image, Font } from "@react-pdf/renderer";
 import { getSubTotalValue, getTotalValue } from "@/constants/pdf-helpers";
+import { resolveBodyFontFamily } from "@/lib/invoice/resolve-pdf-font";
 import { GEIST_FONT, GEIST_MONO_FONT } from "@/constants/pdf-fonts";
 import { formatCurrencyText } from "@/constants/currency";
 import { createTw } from "react-pdf-tailwind";
@@ -23,29 +24,34 @@ Font.register({
   fonts: GEIST_FONT,
 });
 
-const tw = createTw({
-  theme: {
-    fontFamily: {
-      default: ["Geist"],
-      geistmono: ["GeistMono"],
-    },
-    extend: {
-      colors: {
-        background: "#0A0A0A",
-        borderColor: "#1c1c1c",
-      },
-      fontSize: {
-        "2xs": "0.625rem",
-        "3xs": "0.5rem",
-      },
-    },
-  },
-});
-
 // Invoice PDF Document component
 const VercelPdf: React.FC<{ data: ZodCreateInvoiceSchema }> = ({ data }) => {
   const subtotal = getSubTotalValue(data);
   const total = getTotalValue(data);
+
+  // Built per-render so the body font follows the selected theme font and so a CJK
+  // fallback is appended only when the invoice actually contains Chinese (issue #48).
+  // Applied as an explicit fontFamily array on the Page below — react-pdf-tailwind only
+  // keeps the first family from a class, which would drop the CJK fallback.
+  const bodyFontFamily = resolveBodyFontFamily(data, "Geist");
+  const tw = createTw({
+    theme: {
+      fontFamily: {
+        default: bodyFontFamily,
+        geistmono: ["GeistMono"],
+      },
+      extend: {
+        colors: {
+          background: "#0A0A0A",
+          borderColor: "#1c1c1c",
+        },
+        fontSize: {
+          "2xs": "0.625rem",
+          "3xs": "0.5rem",
+        },
+      },
+    },
+  });
 
   return (
     <Document
@@ -54,7 +60,13 @@ const VercelPdf: React.FC<{ data: ZodCreateInvoiceSchema }> = ({ data }) => {
       creator={data.companyDetails.name}
       producer="Invoicely"
     >
-      <Page size="A4" style={tw(cn("font-default text-sm text-black bg-background border border-borderColor"))}>
+      <Page
+        size="A4"
+        style={{
+          ...tw(cn("text-sm text-black bg-background border border-borderColor")),
+          fontFamily: bodyFontFamily,
+        }}
+      >
         <View style={tw("flex flex-row border-b border-borderColor p-4")}>
           <Text style={tw(cn("font-medium text-[40px] leading-[40px] tracking-tighter text-neutral-100"))}>
             {data.invoiceDetails.prefix}
@@ -136,8 +148,13 @@ const VercelPdf: React.FC<{ data: ZodCreateInvoiceSchema }> = ({ data }) => {
         {/* Items Table */}
         <View style={tw("grow")}>
           <View
+            fixed
             style={[
-              tw(cn("flex-row flex items-center px-4 py-2.5 text-sm text-neutral-100 border-b border-borderColor")),
+              tw(
+                cn(
+                  "flex-row flex items-center px-4 py-2.5 text-sm text-neutral-100 border-b border-borderColor bg-background",
+                ),
+              ),
             ]}
           >
             <Text style={tw("w-[60%]")}>Item</Text>
@@ -149,6 +166,7 @@ const VercelPdf: React.FC<{ data: ZodCreateInvoiceSchema }> = ({ data }) => {
             {data.items.map((item, index) => (
               <View
                 key={index}
+                wrap={false}
                 style={tw(
                   cn(
                     "flex-row px-4 py-3 text-2xs border-b border-borderColor",
@@ -176,7 +194,7 @@ const VercelPdf: React.FC<{ data: ZodCreateInvoiceSchema }> = ({ data }) => {
           </View>
         </View>
         {/* Invoice meta data and pricing */}
-        <View style={tw("flex flex-row border-t border-borderColor")}>
+        <View wrap={false} style={tw("flex flex-row border-t border-borderColor")}>
           <View style={tw("flex flex-col w-1/2 border-r border-borderColor")}>
             {/* Payment Information */}
             {data.metadata.paymentInformation.length ? (

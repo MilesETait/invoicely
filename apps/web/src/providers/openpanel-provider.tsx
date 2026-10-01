@@ -1,17 +1,23 @@
 "use client";
 
 import { OpenPanelComponent } from "@openpanel/nextjs";
+import { env } from "@invoicely/utilities";
 
 export const OpenPanelProvider = ({ children }: { children: React.ReactNode }) => {
+  // OpenPanel is optional; without a client id no tracking script is loaded
+  const clientId = env.NEXT_PUBLIC_OPENPANEL_CLIENT_ID;
+
   return (
     <>
-      <OpenPanelComponent
-        clientId="97f47a54-d163-482d-b163-06291921523f"
-        trackScreenViews={true}
-        trackAttributes={true}
-        trackOutgoingLinks={true}
-        trackHashChanges={true}
-      />
+      {clientId && (
+        <OpenPanelComponent
+          clientId={clientId}
+          trackScreenViews={true}
+          trackAttributes={true}
+          trackOutgoingLinks={true}
+          trackHashChanges={true}
+        />
+      )}
       {children}
     </>
   );

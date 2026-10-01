@@ -8,7 +8,11 @@ import { cn } from "@/lib/utils";
 
 type AccordionProps = React.ComponentProps<typeof AccordionPrimitive.Root>;
 type AccordionItemProps = React.ComponentProps<typeof AccordionPrimitive.Item>;
-type AccordionTriggerProps = React.ComponentProps<typeof AccordionPrimitive.Trigger>;
+type AccordionTriggerProps = React.ComponentProps<typeof AccordionPrimitive.Trigger> & {
+  // Interactive controls shown in the header next to the trigger. They render outside the trigger
+  // <button> because a button can't contain another button (invalid HTML and a hydration error).
+  actions?: React.ReactNode;
+};
 type AccordionContentProps = React.ComponentProps<typeof AccordionPrimitive.Content>;
 
 function Accordion({ ...props }: AccordionProps) {
@@ -19,9 +23,9 @@ function AccordionItem({ className, ...props }: AccordionItemProps) {
   return <AccordionPrimitive.Item data-slot="accordion-item" className={cn("", className)} {...props} />;
 }
 
-function AccordionTrigger({ className, children, ...props }: AccordionTriggerProps) {
+function AccordionTrigger({ className, children, actions, ...props }: AccordionTriggerProps) {
   return (
-    <AccordionPrimitive.Header className="flex">
+    <AccordionPrimitive.Header className="hover:bg-card data-[state=open]:bg-card flex items-center">
       <AccordionPrimitive.Trigger
         data-slot="accordion-trigger"
         className={cn(
@@ -33,6 +37,7 @@ function AccordionTrigger({ className, children, ...props }: AccordionTriggerPro
         {children}
         <ChevronDownIcon className="text-muted-foreground pointer-events-none size-4 shrink-0 translate-y-0.5 transition-transform duration-200" />
       </AccordionPrimitive.Trigger>
+      {actions && <div className="flex shrink-0 items-center pr-4">{actions}</div>}
     </AccordionPrimitive.Header>
   );
 }

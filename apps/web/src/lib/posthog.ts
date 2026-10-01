@@ -1,6 +1,9 @@
 import { env } from "@invoicely/utilities";
 import { PostHog } from "posthog-node";
 export default function PostHogClient() {
+  // PostHog is optional; callers get null when it isn't configured
+  if (!env.NEXT_PUBLIC_POSTHOG_KEY) return null;
+
   const posthogClient = new PostHog(env.NEXT_PUBLIC_POSTHOG_KEY, {
     host: env.NEXT_PUBLIC_POSTHOG_HOST,
     flushAt: 1,

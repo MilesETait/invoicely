@@ -2,22 +2,22 @@
 
 ## Framework & Runtime
 
-- **Next.js 15.3.6** — App Router, Turbopack (dev)
+- **Next.js 15.5.18** — App Router, Turbopack (dev)
 - **React 19.1.4** / React DOM 19.1.4
 - **TypeScript 5.8.2** — strict mode, bundler module resolution
 - **Node.js ≥ 20**
 
 ## Monorepo
 
-- **Turborepo 2.5.3** — task-based caching and orchestration
+- **Turborepo 2.9.15** — task-based caching and orchestration
 - **Yarn 4.9.1** workspaces
 - Workspaces: `apps/web`, `packages/db`, `packages/utilities`, `packages/eslint-config`, `packages/typescript-config`
 
 ## Database & ORM
 
-- **PostgreSQL** — currently via Neon serverless; compatible with Supabase or any PostgreSQL
-- **Drizzle ORM 0.43.1** — type-safe query builder
-- **Drizzle Kit 0.31.1** — migrations and schema management
+- **PostgreSQL on Neon** — the client in `packages/db/src/index.ts` uses `drizzle-orm/neon-http`, which only speaks Neon's HTTP protocol. Supabase or plain Postgres would need a driver swap (e.g. `drizzle-orm/postgres-js`)
+- **Drizzle ORM 0.45.2** — type-safe query builder
+- **Drizzle Kit 0.31.10** — migrations and schema management
 - Schema: `packages/db/src/schema/`
 - Migrations: `packages/db/migrations/`
 
@@ -25,12 +25,13 @@
 
 - **IndexedDB** via `idb 8.0.3`
 - Database name: `invoicelygg`
-- Object stores: `inv_invoices`, `inv_images`, `inv_presets`
-- Used for offline/unauthenticated invoice, asset, and preset storage
+- Version 3. Object stores: `inv_invoices`, `inv_images`, `inv_presets`, `inv_default_details`
+- Each store is created with an `objectStoreNames.contains()` check rather than gated on `oldVersion`, because the fork and upstream each shipped a different v2
+- Used for offline/unauthenticated invoice, asset, preset, and default-details storage
 
 ## API Layer
 
-- **tRPC 11.1.2** — end-to-end type-safe API
+- **tRPC 11.17.0** — end-to-end type-safe API
 - **TanStack React Query 5.76.1** — server state management
 - **SuperJSON / devalue** — serialization for dates and complex types
 
@@ -58,7 +59,7 @@ Geist Sans, Geist Mono, JetBrains Mono, Instrument Serif, Instrument Sans, Urban
 
 ## Authentication
 
-- **better-auth 1.2.8** — auth framework with Drizzle adapter
+- **better-auth 1.6.2** — auth framework with Drizzle adapter
 - Google OAuth provider
 - Custom field: `allowedSavingData` (boolean)
 
@@ -74,15 +75,15 @@ Geist Sans, Geist Mono, JetBrains Mono, Instrument Serif, Instrument Sans, Urban
 
 ## Analytics & Monitoring
 
-- **PostHog** — product analytics
-- **OpenPanel** — privacy-focused analytics
+- **PostHog** — product analytics; optional, only initialised when `NEXT_PUBLIC_POSTHOG_KEY` is set
+- **OpenPanel** — privacy-focused analytics; optional, the tracking script only loads when `NEXT_PUBLIC_OPENPANEL_CLIENT_ID` is set
 - **Vercel Analytics** — performance analytics
-- **Sentry** — error tracking
+- **Sentry** — error tracking; optional, client/server/edge all read `NEXT_PUBLIC_SENTRY_DSN` and stay disabled when it's unset
 - **React Scan** — performance debugging (dev)
 
 ## File Storage
 
-- **Cloudflare R2** (S3-compatible) — logo/signature image hosting
+- **Cloudflare R2** (S3-compatible) — logo/signature image hosting for signed-in users. Image URLs are still built from the hardcoded `R2_PUBLIC_URL` (`storage.invoicely.gg`) in `apps/web/src/constants/index.ts`, so the fork needs that made configurable before using its own bucket
 - **AWS SDK** — S3 client for R2 operations
 
 ## Content

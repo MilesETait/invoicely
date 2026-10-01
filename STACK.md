@@ -76,7 +76,7 @@ Geist Sans, Geist Mono, JetBrains Mono, Instrument Serif, Instrument Sans, Urban
 ## Analytics & Monitoring
 
 - **PostHog** — product analytics; optional, only initialised when `NEXT_PUBLIC_POSTHOG_KEY` is set
-- **OpenPanel** — privacy-focused analytics
+- **OpenPanel** — privacy-focused analytics; optional, the tracking script only loads when `NEXT_PUBLIC_OPENPANEL_CLIENT_ID` is set
 - **Vercel Analytics** — performance analytics
 - **Sentry** — error tracking; optional, client/server/edge all read `NEXT_PUBLIC_SENTRY_DSN` and stay disabled when it's unset
 - **React Scan** — performance debugging (dev)

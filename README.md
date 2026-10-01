@@ -92,9 +92,10 @@ different stores, so the fork is on **v3**, and every object store is created wi
 
 ### Optional services
 
-PostHog (`NEXT_PUBLIC_POSTHOG_KEY` / `NEXT_PUBLIC_POSTHOG_HOST`) and Sentry (`NEXT_PUBLIC_SENTRY_DSN`)
-are opt-in. Leave them unset and they stay off. Upstream hardcoded its own Sentry DSN in the
-server and edge configs. The fork reads it from env, so errors never go to upstream's project.
+PostHog (`NEXT_PUBLIC_POSTHOG_KEY` / `NEXT_PUBLIC_POSTHOG_HOST`), OpenPanel
+(`NEXT_PUBLIC_OPENPANEL_CLIENT_ID`) and Sentry (`NEXT_PUBLIC_SENTRY_DSN`) are opt-in. Leave them unset
+and they stay off. Upstream hardcoded its own Sentry DSN and OpenPanel client id. The fork reads both
+from env, so errors and analytics never go to upstream's accounts.
 
 ## 🚢 Deploying this fork (Vercel + Neon)
 
@@ -248,6 +249,7 @@ CF_R2_PUBLIC_DOMAIN="your-public-domain"
 # Analytics and error tracking (optional, disabled when unset)
 NEXT_PUBLIC_POSTHOG_HOST="your-posthog-host"
 NEXT_PUBLIC_POSTHOG_KEY="your-posthog-key"
+NEXT_PUBLIC_OPENPANEL_CLIENT_ID="your-openpanel-client-id"
 NEXT_PUBLIC_SENTRY_DSN="your-sentry-dsn"
 
 # Public URLs

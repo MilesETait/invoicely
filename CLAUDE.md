@@ -102,4 +102,5 @@ This is a fork. `origin` is `MilesETait/invoicely`, and `upstream` is `legions-d
 - **PostHog, OpenPanel, and Sentry are opt-in.** `NEXT_PUBLIC_POSTHOG_KEY` and `NEXT_PUBLIC_OPENPANEL_CLIENT_ID` are optional in the env schema, and each integration is skipped without its key. Client, server, and edge Sentry all read `NEXT_PUBLIC_SENTRY_DSN`. Never hardcode a DSN or analytics id. Upstream did, which sent fork traffic to upstream's accounts.
 - **Accordion header actions.** Put interactive controls in a section header through `AccordionTrigger`'s `actions` prop, never as children; children render inside the trigger `<button>`, and a nested button breaks hydration.
 - **Deployment** is on Vercel (root `apps/web`) with a Vercel-managed Neon database. See "Deploying this fork" in the README.
+- **Outstanding work** is tracked in `TODO.md` at the repo root. Check it before starting fork work, and update it when an item is done.
 - **Still coupled to invoicely.gg:** `R2_PUBLIC_URL` (`constants/index.ts`) and `next.config.ts` `images.remotePatterns` point at upstream's R2 domains, and landing/OG images load from `assets.invoicely.gg`.

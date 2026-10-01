@@ -90,3 +90,15 @@ Uses `fumadocs-ui` + `content-collections` (MDX). Content sources are in `apps/w
 
 - **Do not push or commit database migrations** — migrations are reviewed and managed by maintainers (per README).
 - The project rejects low-quality / "vibe coded" PRs — keep changes deliberate and consistent with existing patterns.
+
+## Fork notes (MilesETait/invoicely)
+
+This is a fork. `origin` is `MilesETait/invoicely`, and `upstream` is `legions-developer/invoicely`, synced via `git merge upstream/main`. Fork-specific facts that override or extend the sections above:
+
+- **Section presets.** Each invoice-form section has a preset dropdown (`components/ui/preset-dropdown.tsx`). Signed out, presets live in the `inv_presets` IndexedDB store. Signed in, they live in the `presets` Postgres table via the `preset` tRPC services (`trpc/services/preset/`). The dropdown merges both. This is separate from upstream's single "default details" record (`inv_default_details`, Assets page), which pre-fills new invoices.
+- **IndexedDB is at v3.** The fork and upstream each shipped a different v2, so `global/indexdb/index.ts` creates every store with an `objectStoreNames.contains()` check, never with `oldVersion` gating. Keep it that way when adding stores.
+- **Database is Neon-only.** `packages/db/src/index.ts` uses `drizzle-orm/neon-http`. A Supabase or plain-Postgres URL will not work without swapping the driver.
+- **Migrations are committed here.** In this fork we are the maintainers, so the "do not commit migrations" constraint below applies to upstream PRs only. Always generate migrations with `yarn db:generate` (never hand-write SQL), and apply them over `DATABASE_URL_UNPOOLED`.
+- **PostHog and Sentry are opt-in.** `NEXT_PUBLIC_POSTHOG_KEY` is optional in the env schema, and `posthog.init` is skipped without it. Client, server, and edge Sentry all read `NEXT_PUBLIC_SENTRY_DSN`. Never hardcode a DSN.
+- **Deployment** is on Vercel (root `apps/web`) with a Vercel-managed Neon database. See "Deploying this fork" in the README.
+- **Still coupled to invoicely.gg:** `R2_PUBLIC_URL` (`constants/index.ts`) and `next.config.ts` `images.remotePatterns` point at upstream's R2 domains, and landing/OG images load from `assets.invoicely.gg`.

@@ -76,21 +76,70 @@ The dropdown merges both sources, with local presets listed first.
 
 ### Settings page
 
-`/settings` documents how to point the app at your own PostgreSQL instance (Supabase, Neon, or any
-provider) through the `DATABASE_URL` environment variable, and explains how local browser storage
-behaves when no database is connected.
+`/settings` documents how to point the app at your own Neon database through the `DATABASE_URL`
+environment variable, and explains how local browser storage behaves when no database is connected.
+
+The database client (`packages/db/src/index.ts`) uses `drizzle-orm/neon-http`, which only speaks
+Neon's HTTP protocol. An earlier version of this page said Supabase would work. It won't without
+swapping the driver.
+
+### Upstream sync
+
+The fork tracks `legions-developer/invoicely` as the `upstream` remote and includes everything up to
+upstream #77 (multi-page PDFs). Both sides independently bumped the IndexedDB schema to v2 for
+different stores, so the fork is on **v3**, and every object store is created with an
+`objectStoreNames.contains()` check rather than gated on the old version number.
+
+### Optional services
+
+PostHog (`NEXT_PUBLIC_POSTHOG_KEY` / `NEXT_PUBLIC_POSTHOG_HOST`) and Sentry (`NEXT_PUBLIC_SENTRY_DSN`)
+are opt-in. Leave them unset and they stay off. Upstream hardcoded its own Sentry DSN in the
+server and edge configs. The fork reads it from env, so errors never go to upstream's project.
+
+## 🚢 Deploying this fork (Vercel + Neon)
+
+1. **Import the repo into Vercel** with **Root Directory** `apps/web` and framework Next.js. Add
+   `ENABLE_EXPERIMENTAL_COREPACK=1` so Vercel uses the pinned Yarn 4.
+2. **Add a database:** in the project, go to Storage → Create → **Neon** and connect it to the
+   project. This sets `DATABASE_URL` (pooled) and `DATABASE_URL_UNPOOLED`.
+3. **Create a Google OAuth client** (Google Cloud Console → APIs & Services → Credentials, type
+   _Web application_):
+   - Authorized JavaScript origins: `https://<your-domain>`, `http://localhost:3000`
+   - Authorized redirect URIs: `https://<your-domain>/api/auth/callback/google`,
+     `http://localhost:3000/api/auth/callback/google`
+   - Leaving the consent screen in **Testing** mode restricts sign-in to the test users you list.
+4. **Set environment variables** in Vercel:
+
+   | Variable                                   | Value                                                                                                                                                                  |
+   | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+   | `NEXT_PUBLIC_BASE_URL`, `BETTER_AUTH_URL`  | `https://<your-domain>` (`http://localhost:3000` for Development)                                                                                                      |
+   | `NEXT_PUBLIC_TRPC_BASE_URL`                | the base URL + `/api/trpc`                                                                                                                                             |
+   | `BETTER_AUTH_SECRET`                       | output of `openssl rand -base64 32`                                                                                                                                    |
+   | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | from step 3                                                                                                                                                            |
+   | `CF_R2_*`                                  | your R2 bucket, or any placeholder string. Without a real bucket, only the signed-in "upload to server" for logos and signatures fails; local image upload still works |
+
+5. **Apply migrations** to the new database from your machine:
+
+   ```bash
+   vercel env pull .env
+   yarn sys-link
+   DATABASE_URL="$(grep '^DATABASE_URL_UNPOOLED=' .env | cut -d= -f2- | tr -d '"')" yarn db:migrate
+   ```
+
+   Migrations go over the unpooled connection. `NEXT_PUBLIC_*` values are inlined at build time, so
+   redeploy after changing them.
 
 ## 🛠️ Tech Stack
 
 ### Core Framework
 
-- **Next.js 15.3.1** - React framework with App Router
+- **Next.js 15.5.18** - React framework with App Router
 - **React 19** - UI library
 - **TypeScript 5.8.2** - Type-safe JavaScript
 
 ### API & State Management
 
-- **tRPC 11.1.2** - End-to-end type-safe APIs
+- **tRPC 11.17.0** - End-to-end type-safe APIs
 - **TanStack Query 5.76.1** - Server state management
 - **Jotai 2.12.3** - Atomic state management
 - **Zod 3.25.7** - Schema validation
@@ -106,9 +155,9 @@ behaves when no database is connected.
 
 ### Database & Authentication
 
-- **Drizzle ORM 0.43.1** - Type-safe database ORM
+- **Drizzle ORM 0.45.2** - Type-safe database ORM
 - **Neon Database** - Serverless PostgreSQL
-- **Better Auth 1.2.8** - Modern authentication library
+- **Better Auth 1.6.2** - Modern authentication library
 - **Google OAuth** - Social authentication
 
 ### File Storage & PDF
@@ -118,7 +167,7 @@ behaves when no database is connected.
 
 ### Development Tools
 
-- **Turbo 2.5.3** - Monorepo build system
+- **Turbo 2.9.15** - Monorepo build system
 - **ESLint 9** - Code linting
 - **Prettier 3.5.3** - Code formatting
 - **Husky 9.1.7** - Git hooks
@@ -196,9 +245,10 @@ CF_R2_SECRET_ACCESS_KEY="your-secret-key"
 CF_R2_BUCKET_NAME="your-bucket-name"
 CF_R2_PUBLIC_DOMAIN="your-public-domain"
 
-# Analytics
+# Analytics and error tracking (optional, disabled when unset)
 NEXT_PUBLIC_POSTHOG_HOST="your-posthog-host"
 NEXT_PUBLIC_POSTHOG_KEY="your-posthog-key"
+NEXT_PUBLIC_SENTRY_DSN="your-sentry-dsn"
 
 # Public URLs
 NEXT_PUBLIC_BASE_URL="http://localhost:3000"

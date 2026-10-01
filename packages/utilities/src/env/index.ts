@@ -14,8 +14,9 @@ export const env = createEnv({
     CF_R2_PUBLIC_DOMAIN: z.string(),
   },
   client: {
-    NEXT_PUBLIC_POSTHOG_HOST: z.string(),
-    NEXT_PUBLIC_POSTHOG_KEY: z.string(),
+    // PostHog is optional: analytics only initialise when a key is set
+    NEXT_PUBLIC_POSTHOG_HOST: z.string().optional(),
+    NEXT_PUBLIC_POSTHOG_KEY: z.string().optional(),
     NEXT_PUBLIC_BASE_URL: z.string(),
     NEXT_PUBLIC_TRPC_BASE_URL: z.string(),
   },
